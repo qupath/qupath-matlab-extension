@@ -3,8 +3,8 @@
 	<modelVersion>4.0.0</modelVersion>
 
 
-	<artifactId>qupath-matlab</artifactId>
-	<name>qupath-matlab</name>
+	<artifactId>qupath-matlab-extension</artifactId>
+	<name>qupath-matlab-extension</name>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -14,7 +14,7 @@
 		<dependency>
 			<groupId>qupath</groupId>
 			<artifactId>qupath-gui-fx</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2</version>
 		</dependency>
 	</dependencies>
 	
@@ -42,5 +42,5 @@
 	
 	<description>Support to help with using QuPath together with MATLAB</description>
 	<groupId>qupath</groupId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 </project>

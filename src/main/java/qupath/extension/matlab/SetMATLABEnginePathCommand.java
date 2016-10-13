@@ -24,15 +24,15 @@
 package qupath.extension.matlab;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.beans.property.StringProperty;
 import qupath.lib.gui.QuPathGUI;
 import qupath.lib.gui.commands.interfaces.PathCommand;
 import qupath.lib.gui.helpers.DisplayHelpers;
+import qupath.lib.gui.prefs.PathPrefs;
 
 /**
  * Command to help with putting the MATLAB engine JAR on the classpath used by QuPath.
@@ -49,48 +49,42 @@ public class SetMATLABEnginePathCommand implements PathCommand {
 	
 	private static Logger logger = LoggerFactory.getLogger(SetMATLABEnginePathCommand.class);
 	
+	final private static StringProperty matlabEnginePath = PathPrefs.createPersistentPreference("matlabEnginePath", null);
+	
 	private QuPathGUI qupath;
 	
 	public SetMATLABEnginePathCommand(final QuPathGUI qupath) {
 		this.qupath = qupath;
+		// Add MATLAB engine path
+		updateExtensionPath();
+		// Listen for changes to path property
+		matlabEnginePath.addListener((v, o, n) -> updateExtensionPath());
+	}
+
+	private void updateExtensionPath() {
+		String path = matlabEnginePath.get();
+		if (path != null && new File(path).exists()) {
+			qupath.addExtensionJar(new File(path));
+		}
 	}
 
 	@Override
 	public void run() {
 		// Prompt to select MATLAB engine file
 		File fileEngine = qupath.getDialogHelper().promptForFile("Select MATLAB engine", null, "MATLAB engine", new String[]{"jar"});	
-		if (fileEngine == null) {
+		if (fileEngine == null || !fileEngine.isFile()) {
 			logger.warn("No MATLAB engine selected");
 		}
+		
 		// Check name
 		if (!fileEngine.getName().equals("engine.jar")) {
 			if (!DisplayHelpers.showConfirmDialog("Set MATLAB engine", "This looks like the wrong file!\nThe MATLAB engine should be called engine.jar, but you selected " + fileEngine.getName() + "\n\nTry to link anyway?"))
 				return;
 		}
-		
-		// Delete any existing file or link, if necessary
-		File fileLink = new File(QuPathGUI.getExtensionDirectory(), "matlab_engine");
-		if (fileLink.exists())
-			fileLink.delete();
-		
-		// Try to create a symbolic link to the directory first
-		try {
-			Files.createSymbolicLink(fileEngine.getParentFile().toPath(), fileLink.toPath());
-			qupath.refreshExtensions(false);
-			logger.error("Symbolic link created at " + fileLink.getAbsolutePath());
-		} catch (Exception e) {
-			logger.error("Unable to link to " + fileEngine.getAbsolutePath(), e);
-			try {
-				// If that didn't work, try copying the JAR
-				fileLink = new File(QuPathGUI.getExtensionDirectory(), "matlab_engine.jar");
-				Files.copy(fileEngine.toPath(), fileLink.toPath());
-				qupath.refreshExtensions(false);
-				logger.error("MATLAB engine copied to " + fileLink.getAbsolutePath());
-			} catch (IOException e1) {
-				logger.error("Error copying MATLAB engine", e1);
-				DisplayHelpers.showErrorMessage("Set MATLAB engine", "Unable to copy MATLAB engine to QuPath extension directory - please try to copy or link the file manually");
-			}
-		}
+
+		// Set the path
+		matlabEnginePath.set(fileEngine.getAbsolutePath());
+		qupath.refreshExtensions(false);
 	}
 
 }
