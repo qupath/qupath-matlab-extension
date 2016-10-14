@@ -62,20 +62,20 @@ public class QuPathMATLABExtension implements QuPathExtension {
 				);
 		
 		QuPathGUI.addMenuItems(
-				qupath.getMenu("Extensions>MATLAB>Run QuPath from MATLAB", true),
-				QuPathGUI.createCommandAction(new MATLABQuPathSetupCommand(qupath), "Export MATLAB-QuPath scripts")
+				qupath.getMenu("Extensions>MATLAB", true),
+				QuPathGUI.createCommandAction(new MATLABQuPathSetupCommand(qupath), "Export MATLAB scripts")
 				);
 		
 		// Add script for setting engine path
 		QuPathGUI.addMenuItems(
-				qupath.getMenu("Extensions>MATLAB>Call MATLAB from QuPath", true),
+				qupath.getMenu("Extensions>MATLAB", true),
 				QuPathGUI.createCommandAction(new SetMATLABEnginePathCommand(qupath), "Set path to MATLAB engine"),
 				null
 				);
 		
 		// Link useful scripts
 		for (Entry<String, String> entry : readScriptMap("groovy", ".groovy").entrySet()) {
-			Menu menuGroovy = qupath.getMenu("Extensions>MATLAB>Call MATLAB from QuPath>Scripts", true);
+			Menu menuGroovy = qupath.getMenu("Extensions>MATLAB>Groovy MATLAB samples", true);
 			String scriptName = entry.getKey().replaceAll("_", " ").replaceAll("/", " ").trim();
 			if (scriptName.toLowerCase().endsWith(".groovy"))
 				scriptName = scriptName.substring(0, scriptName.length() - ".groovy".length());
