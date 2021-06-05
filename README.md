@@ -1,3 +1,5 @@
+**This was written for QuPath v0.1.2. It is no longer maintained and is not compatible with more recent QuPath and MATLAB versions.**
+
 QuPath MATLAB Extension
 =======================
 
